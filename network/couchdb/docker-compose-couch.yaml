@@ -1,0 +1,53 @@
+version: '3.3'
+
+services:
+  couchdb0:
+    image: docker.io/couchdb:3.3
+    container_name: couchdb0.main.com
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=adminpw
+    volumes:
+      - couchdb0-data:/opt/couchdb/data
+      - ./config/local.ini:/opt/couchdb/etc/local.d/10-custom.ini
+    ports:
+      - "15984:5984"
+    networks:
+      - fabric-network
+
+  couchdb1:
+    image: docker.io/couchdb:3.3
+    container_name: couchdb1.main.com
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=adminpw
+    volumes:
+      - couchdb1-data:/opt/couchdb/data
+      - ./config/local.ini:/opt/couchdb/etc/local.d/10-custom.ini
+    ports:
+      - "16984:5984"
+    networks:
+      - fabric-network
+
+  couchdb2:
+    image: docker.io/couchdb:3.3
+    container_name: couchdb2.main.com
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=adminpw
+    volumes:
+      - couchdb2-data:/opt/couchdb/data
+      - ./config/local.ini:/opt/couchdb/etc/local.d/10-custom.ini
+    ports:
+      - "17984:5984"
+    networks:
+      - fabric-network
+
+volumes:
+  couchdb0-data:
+  couchdb1-data:
+  couchdb2-data:
+
+networks:
+  fabric-network:
+    driver: bridge

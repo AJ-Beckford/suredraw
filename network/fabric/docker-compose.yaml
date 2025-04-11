@@ -1,0 +1,111 @@
+version: '3.3'
+
+networks:
+  fabric-network:
+    external: true
+
+volumes:
+  orderer0-data:
+  orderer1-data:
+  peer0-data:
+  peer1-data: 
+  peer2-data:
+
+services:
+  # ORDERERS
+  orderer0.main.com:
+    image: hyperledger/fabric-orderer:2.5
+    environment:
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_LISTENPORT=7050
+      - ORDERER_GENERAL_LOCALMSPID=OrdererOrgMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/etc/hyperledger/msp
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/etc/hyperledger/tls/server.key
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/etc/hyperledger/tls/server.crt
+    volumes:
+      - orderer0-data:/var/hyperledger/production/orderer
+      - ./crypto-config/ordererOrganizations/main.com/orderers/orderer0.main.com:/etc/hyperledger
+    networks:
+      - fabric-network
+
+  orderer1.main.com:
+    image: hyperledger/fabric-orderer:2.5
+    environment:
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_LISTENPORT=7050
+      - ORDERER_GENERAL_LOCALMSPID=OrdererOrgMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/etc/hyperledger/msp
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/etc/hyperledger/tls/server.key
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/etc/hyperledger/tls/server.crt
+    volumes:
+      - orderer1-data:/var/hyperledger/production/orderer
+      - ./crypto-config/ordererOrganizations/main.com/orderers/orderer1.main.com:/etc/hyperledger
+    networks:
+      - fabric-network
+
+  # PEERS (Connected to existing CouchDB)
+  peer0.main.com:
+    image: hyperledger/fabric-peer:2.5
+    environment:
+      - CORE_PEER_ID=peer0.main.com
+      - CORE_PEER_ADDRESS=peer0.main.com:7051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.main.com:7052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.main.com:7051
+      - CORE_PEER_LOCALMSPID=MainOrgMSP
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=admin
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=adminpw
+    volumes:
+      - peer0-data:/var/hyperledger/production
+      - ./crypto-config/peerOrganizations/main.com/peers/peer0.main.com:/etc/hyperledger
+    depends_on:
+      - couchdb0
+    networks:
+      - fabric-network
+
+  peer1.main.com:
+    image: hyperledger/fabric-peer:2.5
+    environment:
+      - CORE_PEER_ID=peer1.main.com
+      - CORE_PEER_ADDRESS=peer1.main.com:7051
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1:5984
+    volumes:
+      - peer1-data:/var/hyperledger/production
+      - ./crypto-config/peerOrganizations/main.com/peers/peer1.main.com:/etc/hyperledger
+    depends_on:
+      - couchdb1
+    networks:
+      - fabric-network
+
+  peer2.main.com:
+    image: hyperledger/fabric-peer:2.5
+    environment:
+      - CORE_PEER_ID=peer2.main.com
+      - CORE_PEER_ADDRESS=peer2.main.com:7051
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb2:5984
+    volumes:
+      - peer2-data:/var/hyperledger/production
+      - ./crypto-config/peerOrganizations/main.com/peers/peer2.main.com:/etc/hyperledger
+    depends_on:
+      - couchdb2
+    networks:
+      - fabric-network
+
+  # CLI Tool
+  cli:
+    image: hyperledger/fabric-tools:2.5
+    environment:
+      - GOPATH=/opt/gopath
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+    volumes:
+      - ./chaincode:/opt/gopath/src/chaincode
+      - ./crypto-config:/etc/hyperledger/crypto
+      - /var/run/docker.sock:/host/var/run/docker.sock
+    working_dir: /opt/gopath/src/chaincode
+    networks:
+      - fabric-network

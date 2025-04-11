@@ -1,0 +1,29 @@
+OrdererOrgs:
+  - Name: OrdererOrg
+    Domain: main.com
+    EnableNodeOUs: true
+    CA:
+      Hostname: ca-orderer
+    TLS:
+      Hostname: tls-ca-orderer
+    Specs:
+      - Hostname: orderer0
+      - Hostname: orderer1
+    Users:
+      Count: 1
+
+PeerOrgs:
+  - Name: MainOrg
+    Domain: main.com
+    EnableNodeOUs: true
+    CA:
+      Hostname: ca-root
+    Intermediate:
+      Hostname: ca-intermediate
+      Parent:
+        Host: ca-root
+        Port: 7054
+    Template:
+      Count: 3
+    Users:
+      Count: 2

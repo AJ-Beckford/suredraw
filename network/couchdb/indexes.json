@@ -1,0 +1,11 @@
+{
+    "_id": "_design/indexes",
+    "views": {
+      "byGroupId": {
+        "map": "function(doc) { if (doc.groupId) { emit(doc.groupId, doc); }}"
+      },
+      "byMemberId": {
+        "map": "function(doc) { if (doc.memberId) { emit(doc.memberId, doc); }}"
+      }
+    }
+  }

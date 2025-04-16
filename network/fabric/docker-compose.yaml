@@ -25,7 +25,8 @@ services:
       - ORDERER_GENERAL_TLS_CERTIFICATE=/etc/hyperledger/tls/server.crt
     volumes:
       - orderer0-data:/var/hyperledger/production/orderer
-      - ./crypto-config/ordererOrganizations/main.com/orderers/orderer0.main.com:/etc/hyperledger
+      - ./crypto-config/ordererOrganizations/main.com/orderers/orderer0.main.com/msp:/etc/hyperledger/msp
+      - ./crypto-config/ordererOrganizations/main.com/orderers/orderer0.main.com/tls:/etc/hyperledger/tls
     networks:
       - fabric-network
 
@@ -41,7 +42,8 @@ services:
       - ORDERER_GENERAL_TLS_CERTIFICATE=/etc/hyperledger/tls/server.crt
     volumes:
       - orderer1-data:/var/hyperledger/production/orderer
-      - ./crypto-config/ordererOrganizations/main.com/orderers/orderer1.main.com:/etc/hyperledger
+      - ./crypto-config/ordererOrganizations/main.com/orderers/orderer1.main.com/msp:/etc/hyperledger/msp
+      - ./crypto-config/ordererOrganizations/main.com/orderers/orderer1.main.com/tls:/etc/hyperledger/tls
     networks:
       - fabric-network
 
@@ -56,8 +58,10 @@ services:
       - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
       - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.main.com:7051
       - CORE_PEER_LOCALMSPID=MainOrgMSP
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/msp
       - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0.main.com:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_SKIPHOSTNAMEVERIFICATION=true
       - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=admin
       - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=adminpw
     volumes:
@@ -73,7 +77,7 @@ services:
     environment:
       - CORE_PEER_ID=peer1.main.com
       - CORE_PEER_ADDRESS=peer1.main.com:7051
-      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1.main.com:5984
     volumes:
       - peer1-data:/var/hyperledger/production
       - ./crypto-config/peerOrganizations/main.com/peers/peer1.main.com:/etc/hyperledger
@@ -87,7 +91,7 @@ services:
     environment:
       - CORE_PEER_ID=peer2.main.com
       - CORE_PEER_ADDRESS=peer2.main.com:7051
-      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb2:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb2.main.com:5984
     volumes:
       - peer2-data:/var/hyperledger/production
       - ./crypto-config/peerOrganizations/main.com/peers/peer2.main.com:/etc/hyperledger
